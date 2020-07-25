@@ -46,8 +46,7 @@ def login():
         if user is None:
             try:
                 user = User.load_random_user()
-            # todo: Catch a sqlalchemy error instead
-            except sqlite3.Error as ex:
+            except Exception as ex:
                 result['error'] = 2
                 # or raise further maybe
                 return result
