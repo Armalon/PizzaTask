@@ -131,11 +131,32 @@ def menu():
 
 @app.route('/make_order', methods=['POST'])
 def make_order():
+    """
+    Creating an order
+    req.args: {
+        order: [
+            {
+                'id': 123,
+                'quantity': 2
+            },
+        ],
+        name: 'String',
+        phone: 'String',
+        address: 'String'
+    }
+    :return:
+    {
+        error: 0,
+        order: Order
+    }
+    """
+
     result = {
         'error': 1,
         'order': None
     }
 
+    # Check if all the reuired params are passed
     if request.get_json() is None or\
             request.get_json().get('order') is None\
             or request.get_json().get('name') is None\
@@ -153,6 +174,7 @@ def make_order():
             db.session.add(user)
             db.session.commit()
 
+        # Setting user data to the session
         session['user_id'] = user.id
         session['user_name'] = user.username
         session['user_phone'] = user.phone
@@ -166,6 +188,7 @@ def make_order():
     }
     result['user'] = user_result
 
+    # Creating an order
     o = Order(user_id=user_result['id'],
               username=request.get_json().get('name'),
               address=request.get_json().get('address'),
@@ -173,6 +196,7 @@ def make_order():
 
     o.total_price = SERVICE_INFO['delivery_price']
 
+    # Setting OrderProducts to the order
     order_products = request.get_json().get('order')
     for order_product in order_products:
         p = Product.query.get(order_product['id'])
