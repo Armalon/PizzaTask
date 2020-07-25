@@ -30,7 +30,9 @@ def login():
         'error': 0,
         'user': None
     }
+
     if 'user_id' in session:
+        # Taking user info from a current session
         result['user'] = {
             'id': session['user_id'],
             'name': session['user_name'],
@@ -39,10 +41,13 @@ def login():
         }
     else:
         user = None
+
+        # If user_id is provided (was stored on a frontend part)
         if request.get_json() is not None \
                 and request.get_json().get('user_id') is not None:
             user = User.load_user(int(request.get_json().get('user_id')))
 
+        # Getting a random user if user_id is not provided or not found in DB
         if user is None:
             try:
                 user = User.load_random_user()
@@ -51,6 +56,7 @@ def login():
                 # or raise further maybe
                 return result
 
+        # Setting data to the session and returning a result
         if user is not None:
             result['user'] = {
                 'id': user.id,
@@ -58,12 +64,14 @@ def login():
                 'phone': user.phone,
                 'address': user.address,
             }
+
             session['user_id'] = user.id
             session['user_name'] = user.username
             session['user_phone'] = user.phone
             session['user_address'] = user.address
         else:
             result['error'] = 1
+
     return result
 
 
@@ -76,10 +84,13 @@ def logout():
         error: 0,
     }
     """
+
+    # Clearing all user data from session
     session.pop('user_id', None)
     session.pop('user_name', None)
     session.pop('user_phone', None)
     session.pop('user_address', None)
+
     return {
         'error': 0
     }
@@ -87,6 +98,24 @@ def logout():
 
 @app.route('/menu')
 def menu():
+    """
+    Getting all the menu elements
+    req.args: {
+        filters: {
+            'type': 'String',
+            'base': 'String',
+            'crust': 'String',
+        }
+    }
+    :return:
+    {
+        error: 0,
+        products: [Product]
+    }
+    """
+
+    # note: Filters are not provided from a Frontend at the moment,
+    # all the filtration is implemented on a Frontend part
     filters = request.args
     # filtering out all not valid keys
     filters = {k: v for (k, v) in filters.items() if k in {'type', 'base', 'crust'}}
