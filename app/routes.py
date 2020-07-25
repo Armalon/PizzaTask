@@ -220,6 +220,17 @@ def make_order():
 
 @app.route('/my_orders')
 def my_orders():
+    """
+    Getting all user orders using session data
+    req.args: {
+    }
+    :return:
+    {
+        error: 0,
+        orders_list: [Order]
+    }
+    """
+
     result = {
         'error': 1,
         'orders_list': None
@@ -228,8 +239,12 @@ def my_orders():
         return result
 
     result['error'] = 0
+
+    # Getting my orders list
     orders_list = Order.get_my_orders(session['user_id'])
     for order in orders_list:
+        # Calculating an order status
+        # and setting it back to the order
         now = datetime.utcnow().timestamp()
         create_timestamp = order.create_timestamp.timestamp()
         time_passed = now - create_timestamp
@@ -245,6 +260,7 @@ def my_orders():
         else:
             status_countdown = ORDER_STATUS_EXPIRATION['CONFIRMED_AFTER'] - time_passed
 
+        # setting an status_countdown and returning it back to the Frontend
         order.status_countdown = status_countdown
 
         db.session.commit()
@@ -256,6 +272,19 @@ def my_orders():
 
 @app.route('/service_info')
 def service_info():
+    """
+    Returning service info
+    req.args: {
+    }
+    :return:
+    {
+        error: 0,
+        info: {
+            'delivery_price': 4,
+            'usd_to_eur_multiplier': 1.16,
+        }
+    }
+    """
     return {
         'info': SERVICE_INFO,
         'error': 0
