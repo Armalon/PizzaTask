@@ -56,14 +56,8 @@ def login():
 
         # Setting data to the session and returning a result
         if user is not None:
-            result['user'] = {
-                'id': user.id,
-                'name': user.username,
-                'phone': user.phone,
-                'address': user.address,
-            }
-
             helpers.user_to_session(session, user)
+            result['user'] = helpers.session_to_user_result(session)
         else:
             result['error'] = 1
 
@@ -167,17 +161,9 @@ def make_order():
             db.session.commit()
 
         # Setting user data to the session
-        session['user_id'] = user.id
-        session['user_name'] = user.username
-        session['user_phone'] = user.phone
-        session['user_address'] = user.address
+        helpers.user_to_session(session, user)
 
-    user_result = {
-        'id': session['user_id'],
-        'name': session['user_name'],
-        'phone': session['user_phone'],
-        'address': session['user_address']
-    }
+    user_result = helpers.session_to_user_result(session)
     result['user'] = user_result
 
     # Creating an order
