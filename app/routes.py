@@ -4,7 +4,10 @@ import sqlite3
 
 from app.models import User, Product, ProductOrder, Order, OrderStatus
 
+import app.helpers as helpers
+
 from config import SERVICE_INFO, ORDER_STATUS_EXPIRATION
+
 
 @app.route('/')
 def index():
@@ -86,10 +89,7 @@ def logout():
     """
 
     # Clearing all user data from session
-    session.pop('user_id', None)
-    session.pop('user_name', None)
-    session.pop('user_phone', None)
-    session.pop('user_address', None)
+    helpers.clear_session(session)
 
     return {
         'error': 0
