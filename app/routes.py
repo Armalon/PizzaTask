@@ -36,12 +36,7 @@ def login():
 
     if 'user_id' in session:
         # Taking user info from a current session
-        result['user'] = {
-            'id': session['user_id'],
-            'name': session['user_name'],
-            'phone': session['user_phone'],
-            'address': session['user_address'],
-        }
+        result['user'] = helpers.session_to_user_result(session)
     else:
         user = None
 
@@ -68,10 +63,7 @@ def login():
                 'address': user.address,
             }
 
-            session['user_id'] = user.id
-            session['user_name'] = user.username
-            session['user_phone'] = user.phone
-            session['user_address'] = user.address
+            helpers.user_to_session(session, user)
         else:
             result['error'] = 1
 
